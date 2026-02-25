@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Identity;
 using MiniSocial.Dto;
 using MiniSocial.Models;
@@ -11,9 +12,10 @@ public class UserService
 
     public UserService(IPasswordHasher<User> passwordHasher)
     {
-        _passwordHasher = passwordHasher;    
+        _passwordHasher = passwordHasher;
     }
 
+    //mock
     private static List<User> _users = new List<User> {};
 
     public async Task<List<User>> GetAllUsers()
@@ -23,29 +25,29 @@ public class UserService
         return _users;
     }
 
-    public async Task<UserExitDto> PostUser(UserEntryDto user)
+    public async Task<UserResponseDto> PostUser(UserRequestDto userEntry)
     {
 
-        if (user.password.Length < 10)
+        if (userEntry.password.Length < 10)
         {
             await Task.Delay(100);
             throw new ArgumentException("a senha precisa ter mais de 10 caracteres");
         }
 
-        User userEntry = new User
+        User user = new User
         {
-          userName = user.userName,
+          userName = userEntry.userName,
         };
 
         //usa o passwordhasher do asp.net core pra dar hash na senha
-        userEntry.password = _passwordHasher.HashPassword(userEntry, user.password);
+        user.password = _passwordHasher.HashPassword(user, userEntry.password);
 
-        _users.Add(userEntry);
+        _users.Add(user);
         await Task.Delay(100);
 
         UserExitDto userExit = new UserExitDto
         {
-            userName = userEntry.userName
+            userName = user.userName
         };
 
         return userExit;

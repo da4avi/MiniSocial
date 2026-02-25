@@ -1,6 +1,6 @@
 namespace MiniSocial.Dto;
 
-public class UserEntryDto
+public class UserRequestDto
 {
     public string userName { get; set; } = string.Empty;
     public string password { get; set; } = string.Empty;

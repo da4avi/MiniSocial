@@ -24,7 +24,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostUser(UserEntryDto user)
+    public async Task<IActionResult> PostUser(UserRequestDto user)
     {
         var result = await _userService.PostUser(user);
         return Ok(result);
