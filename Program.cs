@@ -3,29 +3,28 @@ using MiniSocial.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//habilita o uso da pasta controllers
+//controllers
 builder.Services.AddControllers();
 
+//services
 builder.Services.AddScoped<UserService>();
 
+//swagger
 builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
-
-// Add services to the container.
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // O Swagger é mais amigável que o "OpenApi" puro por enquanto
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// 2. ISSO É ESSENCIAL: Ativa a página visual do Swagger para você testar
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+//http = https
 app.UseHttpsRedirection();
 
+//mapeia os controllers
 app.MapControllers();
 
 app.Run();
