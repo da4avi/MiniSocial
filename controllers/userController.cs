@@ -7,9 +7,14 @@ namespace MiniSocial.Controllers;
 
 [ApiController]
 [Route("api/User")]
-public class UserController(UserService userService) : ControllerBase
+public class UserController : ControllerBase
 {
-    private readonly UserService _userService = userService;
+    private readonly UserService _userService;
+
+    public UserController(UserService userService)
+    {
+        _userService = userService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
