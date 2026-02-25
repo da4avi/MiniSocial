@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MiniSocial.Dto;
 using MiniSocial.Models;
 using MiniSocial.Services;
 
@@ -6,14 +7,9 @@ namespace MiniSocial.Controllers;
 
 [ApiController]
 [Route("api/User")]
-public class UserController : ControllerBase
+public class UserController(UserService userService) : ControllerBase
 {
-    private readonly UserService _userService;
-
-    public UserController(UserService userService)
-    {
-        _userService = userService;
-    }
+    private readonly UserService _userService = userService;
 
     [HttpGet]
     public async Task<IActionResult> GetAllUsers()
@@ -23,7 +19,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostUser(User user)
+    public async Task<IActionResult> PostUser(UserEntryDto user)
     {
         var result = await _userService.PostUser(user);
         return Ok(result);

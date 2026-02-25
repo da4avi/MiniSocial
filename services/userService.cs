@@ -1,14 +1,20 @@
+using System.Reflection;
+using Microsoft.AspNetCore.Identity;
+using MiniSocial.Dto;
 using MiniSocial.Models;
 
 namespace MiniSocial.Services;
 
 public class UserService
 {
-    private static List<User> _users = new List<User>
+    private readonly IPasswordHasher<User> _passwordHasher;
+
+    public UserService(IPasswordHasher<User> passwordHasher)
     {
-        new User { Id = 1, userName = "davi", password = "123" },
-        new User { Id = 2, userName = "rau", password = "456" }
-    };
+        _passwordHasher = passwordHasher;    
+    }
+
+    private static List<User> _users = new List<User> {};
 
     public async Task<List<User>> GetAllUsers()
     {
@@ -17,25 +23,32 @@ public class UserService
         return _users;
     }
 
-    public async Task<User> PostUser(User user)
+    public async Task<UserExitDto> PostUser(UserEntryDto user)
     {
-        try
-        {
-            if (user.password.Length < 10)
-            {
-                await Task.Delay(100);
-                throw new Exception("a senha precisa ter mais de 10 caracteres");
-            }
 
-            _users.Add(user);
+        if (user.password.Length < 10)
+        {
             await Task.Delay(100);
+            throw new ArgumentException("a senha precisa ter mais de 10 caracteres");
+        }
 
-            return user;
-        }
-        catch (Exception)
+        User userEntry = new User
         {
-            throw;
-        }
+          userName = user.userName,
+        };
+
+        //usa o passwordhasher do asp.net core pra dar hash na senha
+        userEntry.password = _passwordHasher.HashPassword(userEntry, user.password);
+
+        _users.Add(userEntry);
+        await Task.Delay(100);
+
+        UserExitDto userExit = new UserExitDto
+        {
+            userName = userEntry.userName
+        };
+
+        return userExit;
     }
 }
 

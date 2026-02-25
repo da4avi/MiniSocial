@@ -1,8 +1,7 @@
-namespace MiniSocial.Models;
+namespace MiniSocial.Dto;
 
-public class User
+public class UserEntryDto
 {
-    public int? Id { get; set; }
     public string userName { get; set; } = string.Empty;
     public string password { get; set; } = string.Empty;
     public string? bio { get; set; } = string.Empty;
