@@ -1,7 +1,9 @@
 namespace MiniSocial.Dto;
 
-public class UserResponseDto
+public class UserResponseDto(Guid? id, string userName, DateTime? createdAt, DateTime? updatedAt)
 {
-    public int Id { get; set; }
-    public string userName { get; set; } = string.Empty;
+    public Guid? Id { get; set; } = id;
+    public string UserName { get; set; } = userName;
+    public DateTime? CreatedAt { get; set; } = createdAt;
+    public DateTime? UpdatedAt { get; set; } = updatedAt;
 }

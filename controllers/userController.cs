@@ -23,10 +23,24 @@ public class UserController : ControllerBase
         return Ok(result);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> PostUser(UserRequestDto user)
+    [HttpPost("Login")]
+    public async Task<IActionResult> Login(LoginRequestDto login)
     {
-        var result = await _userService.PostUser(user);
+        var result = await _userService.Login(login);
+        return Ok(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> PostUser(UserRequestDto userRequest)
+    {
+        var result = await _userService.PostUser(userRequest);
+        return Ok(result);
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateUser(UserUpdateDto userUpdate)
+    {
+        var result = await _userService.UpdateUser(userUpdate);
         return Ok(result);
     }
 }

@@ -3,7 +3,7 @@ namespace MiniSocial.Models;
 public class Post
 {
     public int? Id { get; set; }
-    public string? title { get; set; } = string.Empty;
-    public string text { get; set; } = string.Empty;
-    public int userId { get; set; }
+    public string? Title { get; set; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
+    public int UserId { get; set; }
 }

@@ -16,7 +16,7 @@ public class UserService
     }
 
     //mock
-    private static List<User> _users = new List<User> {};
+    private static readonly List<User> _users = [];
 
     public async Task<List<User>> GetAllUsers()
     {
@@ -25,32 +25,52 @@ public class UserService
         return _users;
     }
 
-    public async Task<UserResponseDto> PostUser(UserRequestDto userEntry)
+    public async Task<LoginResponseDto> Login(LoginRequestDto login)
     {
+        //procura o usuario pelo UserName. se nao achar da exception
+        User user = _users.FirstOrDefault(user => user.UserName == login.UserName) ?? throw new Exception("Failed Login");
 
-        if (userEntry.password.Length < 10)
+        //confere se a senha ta certa. se erradi exception
+        var result = _passwordHasher.VerifyHashedPassword(null!, user.Password, login.Password);
+        if (result == PasswordVerificationResult.Failed)
         {
-            await Task.Delay(100);
-            throw new ArgumentException("a senha precisa ter mais de 10 caracteres");
-        }
+            throw new Exception("Failed Login");
+        } 
 
-        User user = new User
-        {
-          userName = userEntry.userName,
-        };
+        return new LoginResponseDto(user.Id, user.UserName); 
+    }
 
+    public async Task<UserResponseDto> PostUser(UserRequestDto userRequest)
+    {
         //usa o passwordhasher do asp.net core pra dar hash na senha
-        user.password = _passwordHasher.HashPassword(user, userEntry.password);
+        string passwordHash = _passwordHasher.HashPassword(null!, userRequest.Password);
+
+        //cria o usuario no tipo User pra ir pro banco
+        User user = new(userRequest.UserName, passwordHash, userRequest.Password);
 
         _users.Add(user);
         await Task.Delay(100);
 
-        UserExitDto userExit = new UserExitDto
-        {
-            userName = user.userName
-        };
+        return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, null);
+    }
 
-        return userExit;
+    public async Task<UserResponseDto> UpdateUser(UserUpdateDto userUpdate)
+    {   
+        //confere se tem algo vim pra atualizar
+        if (userUpdate.UserName == null && userUpdate.Password == null && userUpdate.Bio == null) throw new Exception("Nothing to update");
+
+        //procura o usuario pelo Id. se nao achar da exception
+        User user = _users.FirstOrDefault(user => user.Id == userUpdate.Id) ?? throw new Exception("Id not found");
+        
+        //atualiza o que tem que atualizar
+        if (!string.IsNullOrWhiteSpace(userUpdate.UserName)) user.UserName = userUpdate.UserName;
+        if (!string.IsNullOrWhiteSpace(userUpdate.Password)) user.Password = _passwordHasher.HashPassword(null!, userUpdate.Password);
+        if (!string.IsNullOrWhiteSpace(userUpdate.Bio)) user.Bio = userUpdate.Bio;
+
+        //salva a data que foi editado
+        user.UpdatedAt = DateTime.UtcNow;
+
+        return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, user.UpdatedAt);
     }
 }
 
