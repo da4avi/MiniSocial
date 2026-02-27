@@ -32,7 +32,7 @@ public class UserService
     public async Task<LoginResponseDto> Login(LoginRequestDto login)
     {
         //procura o usuario pelo UserName. se nao achar da exception
-        User user = _users.FirstOrDefault(user => user.UserName == login.UserName) ?? throw new Exception("Failed Login");
+        User user = await _context.Users.FirstOrDefaultAsync(user => user.UserName == login.UserName) ?? throw new Exception("Failed Login");
 
         //confere se a senha ta certa. se erradi exception
         var result = _passwordHasher.VerifyHashedPassword(null!, user.Password, login.Password);
@@ -64,16 +64,19 @@ public class UserService
 
     public async Task<UserResponseDto> UpdateUser(UserUpdateDto userUpdate)
     {   
-        //confere se tem algo vim pra atualizar
+        //confere se tem algo pra atualizar
         if (userUpdate.UserName == null && userUpdate.Password == null && userUpdate.Bio == null) throw new Exception("Nothing to update");
 
         //procura o usuario pelo Id. se nao achar da exception
         User user = await GetUserById(userUpdate.Id);
         
         //atualiza o que tem que atualizar
-        if (!string.IsNullOrWhiteSpace(userUpdate.UserName)) user.UserName = userUpdate.UserName;
+        if (!string.IsNullOrWhiteSpace(userUpdate.UserName)) user.UserName = userUpdate.UserName; 
         if (!string.IsNullOrWhiteSpace(userUpdate.Password)) user.Password = _passwordHasher.HashPassword(null!, userUpdate.Password);
         if (!string.IsNullOrWhiteSpace(userUpdate.Bio)) user.Bio = userUpdate.Bio;
+
+        //salva no banco
+        _context.SaveChanges();
 
         //salva a data que foi editado
         user.UpdatedAt = DateTime.UtcNow;
@@ -83,7 +86,7 @@ public class UserService
 
     public async Task<User> GetUserById (Guid id)
     {
-        User user = _users.FirstOrDefault(user => user.Id == id) ?? throw new Exception("Id not found");
+        User user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id) ?? throw new Exception("Id not found");
         return user;
     }
 }
