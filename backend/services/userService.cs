@@ -60,7 +60,7 @@ public class UserService
         if (userUpdate.UserName == null && userUpdate.Password == null && userUpdate.Bio == null) throw new Exception("Nothing to update");
 
         //procura o usuario pelo Id. se nao achar da exception
-        User user = _users.FirstOrDefault(user => user.Id == userUpdate.Id) ?? throw new Exception("Id not found");
+        User user = await GetUserById(userUpdate.Id);
         
         //atualiza o que tem que atualizar
         if (!string.IsNullOrWhiteSpace(userUpdate.UserName)) user.UserName = userUpdate.UserName;
@@ -71,6 +71,12 @@ public class UserService
         user.UpdatedAt = DateTime.UtcNow;
 
         return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, user.UpdatedAt);
+    }
+
+    public async Task<User> GetUserById (Guid id)
+    {
+        User user = _users.FirstOrDefault(user => user.Id == id) ?? throw new Exception("Id not found");
+        return user;
     }
 }
 
