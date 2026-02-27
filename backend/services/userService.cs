@@ -50,7 +50,7 @@ public class UserService
         string passwordHash = _passwordHasher.HashPassword(null!, userRequest.Password);
 
         //cria o usuario no tipo User pra ir pro banco
-        User user = new(userRequest.UserName, passwordHash, userRequest.Password);
+        User user = new(userRequest.UserName, passwordHash, null);
 
         //adiciona no banco
         _context.Users.Add(user);
