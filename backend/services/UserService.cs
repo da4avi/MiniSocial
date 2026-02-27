@@ -8,34 +8,36 @@ using MiniSocial.Models;
 
 namespace MiniSocial.Services;
 
-public class UserService
+public class UserService(IPasswordHasher<User> passwordHasher, AppDbContext context)
 {
-    private readonly IPasswordHasher<User> _passwordHasher;
-    private readonly AppDbContext _context;
+    private readonly IPasswordHasher<User> _passwordHasher = passwordHasher;
+    private readonly AppDbContext _context = context;
 
-    public UserService(IPasswordHasher<User> passwordHasher, AppDbContext context)
+    public async Task<List<UserResponseDto>> GetUsers()
     {
-        _passwordHasher = passwordHasher;
-        _context = context;
-    }
+        //pega todos os usuarios
+        List<User> users = await _context.Users.AsNoTracking().ToListAsync();
 
-    //mock
-    private static readonly List<User> _users = [];
+        //lista pro dto
+        List<UserResponseDto> usersResponse = [];
 
-    public async Task<List<User>> GetAllUsers()
-    {
-        List<User> users = await _context.Users.ToListAsync();
+        //monta o dto
+        foreach (var user in users)
+        {
+            UserResponseDto userResponse = new(user.Id, user.UserName, user.CreatedAt, user.UpdatedAt);
+            usersResponse.Add(userResponse);
+        }
 
-        return users;
+        return usersResponse;
     }
 
     public async Task<LoginResponseDto> Login(LoginRequestDto login)
     {
         //procura o usuario pelo UserName. se nao achar da exception
-        User user = await _context.Users.FirstOrDefaultAsync(user => user.UserName == login.UserName) ?? throw new Exception("Failed Login");
+        User user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(user => user.UserName == login.UserName) ?? throw new Exception("Failed Login");
 
-        //confere se a senha ta certa. se erradi exception
-        var result = _passwordHasher.VerifyHashedPassword(null!, user.Password, login.Password);
+        //confere se a senha ta certa. se errada da exception
+        var result = _passwordHasher.VerifyHashedPassword(user, user.Password, login.Password);
         if (result == PasswordVerificationResult.Failed)
         {
             throw new Exception("Failed Login");
@@ -46,18 +48,15 @@ public class UserService
 
     public async Task<UserResponseDto> PostUser(UserRequestDto userRequest)
     {
-        //usa o passwordhasher do asp.net core pra dar hash na senha
-        string passwordHash = _passwordHasher.HashPassword(null!, userRequest.Password);
-
         //cria o usuario no tipo User pra ir pro banco
-        User user = new(userRequest.UserName, passwordHash, null);
+        User user = new(userRequest.UserName, "", null);
+
+        //usa o passwordhasher do asp.net core pra dar hash na senha
+        user.Password = _passwordHasher.HashPassword(user, userRequest.Password);
 
         //adiciona no banco
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
-
-        //adiciona no mock
-        _users.Add(user);
 
         return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, null);
     }
@@ -72,14 +71,14 @@ public class UserService
         
         //atualiza o que tem que atualizar
         if (!string.IsNullOrWhiteSpace(userUpdate.UserName)) user.UserName = userUpdate.UserName; 
-        if (!string.IsNullOrWhiteSpace(userUpdate.Password)) user.Password = _passwordHasher.HashPassword(null!, userUpdate.Password);
+        if (!string.IsNullOrWhiteSpace(userUpdate.Password)) user.Password = _passwordHasher.HashPassword(user, userUpdate.Password);
         if (!string.IsNullOrWhiteSpace(userUpdate.Bio)) user.Bio = userUpdate.Bio;
-
-        //salva no banco
-        _context.SaveChanges();
 
         //salva a data que foi editado
         user.UpdatedAt = DateTime.UtcNow;
+
+        //salva no banco
+        await _context.SaveChangesAsync();
 
         return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, user.UpdatedAt);
     }
@@ -88,6 +87,13 @@ public class UserService
     {
         User user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id) ?? throw new Exception("Id not found");
         return user;
+    }
+
+    public async Task DeleteUser (UserDeleteDto userDelete)
+    {
+        User user = await GetUserById(userDelete.Id);
+        _context.Users.Remove(user);
+        await _context.SaveChangesAsync();
     }
 }
 
