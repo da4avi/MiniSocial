@@ -1,14 +1,22 @@
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Identity;
+using MiniSocial.Dto;
 using MiniSocial.Models;
 
 namespace MiniSocial.Services;
 
 public class UserService
 {
-    private static List<User> _users = new List<User>
+    private readonly IPasswordHasher<User> _passwordHasher;
+
+    public UserService(IPasswordHasher<User> passwordHasher)
     {
-        new User { Id = 1, userName = "davi", password = "123" },
-        new User { Id = 2, userName = "rau", password = "456" }
-    };
+        _passwordHasher = passwordHasher;
+    }
+
+    //mock
+    private static readonly List<User> _users = [];
 
     public async Task<List<User>> GetAllUsers()
     {
@@ -17,25 +25,52 @@ public class UserService
         return _users;
     }
 
-    public async Task<User> PostUser(User user)
+    public async Task<LoginResponseDto> Login(LoginRequestDto login)
     {
-        try
-        {
-            if (user.password.Length < 10)
-            {
-                await Task.Delay(100);
-                throw new Exception("a senha precisa ter mais de 10 caracteres");
-            }
+        //procura o usuario pelo UserName. se nao achar da exception
+        User user = _users.FirstOrDefault(user => user.UserName == login.UserName) ?? throw new Exception("Failed Login");
 
-            _users.Add(user);
-            await Task.Delay(100);
-
-            return user;
-        }
-        catch (Exception)
+        //confere se a senha ta certa. se erradi exception
+        var result = _passwordHasher.VerifyHashedPassword(null!, user.Password, login.Password);
+        if (result == PasswordVerificationResult.Failed)
         {
-            throw;
-        }
+            throw new Exception("Failed Login");
+        } 
+
+        return new LoginResponseDto(user.Id, user.UserName); 
+    }
+
+    public async Task<UserResponseDto> PostUser(UserRequestDto userRequest)
+    {
+        //usa o passwordhasher do asp.net core pra dar hash na senha
+        string passwordHash = _passwordHasher.HashPassword(null!, userRequest.Password);
+
+        //cria o usuario no tipo User pra ir pro banco
+        User user = new(userRequest.UserName, passwordHash, userRequest.Password);
+
+        _users.Add(user);
+        await Task.Delay(100);
+
+        return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, null);
+    }
+
+    public async Task<UserResponseDto> UpdateUser(UserUpdateDto userUpdate)
+    {   
+        //confere se tem algo vim pra atualizar
+        if (userUpdate.UserName == null && userUpdate.Password == null && userUpdate.Bio == null) throw new Exception("Nothing to update");
+
+        //procura o usuario pelo Id. se nao achar da exception
+        User user = _users.FirstOrDefault(user => user.Id == userUpdate.Id) ?? throw new Exception("Id not found");
+        
+        //atualiza o que tem que atualizar
+        if (!string.IsNullOrWhiteSpace(userUpdate.UserName)) user.UserName = userUpdate.UserName;
+        if (!string.IsNullOrWhiteSpace(userUpdate.Password)) user.Password = _passwordHasher.HashPassword(null!, userUpdate.Password);
+        if (!string.IsNullOrWhiteSpace(userUpdate.Bio)) user.Bio = userUpdate.Bio;
+
+        //salva a data que foi editado
+        user.UpdatedAt = DateTime.UtcNow;
+
+        return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, user.UpdatedAt);
     }
 }
 
