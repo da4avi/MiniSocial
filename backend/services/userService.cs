@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using MiniSocial.Data;
 using MiniSocial.Dto;
 using MiniSocial.Models;
 
@@ -9,10 +11,12 @@ namespace MiniSocial.Services;
 public class UserService
 {
     private readonly IPasswordHasher<User> _passwordHasher;
+    private readonly AppDbContext _context;
 
-    public UserService(IPasswordHasher<User> passwordHasher)
+    public UserService(IPasswordHasher<User> passwordHasher, AppDbContext context)
     {
         _passwordHasher = passwordHasher;
+        _context = context;
     }
 
     //mock
@@ -20,9 +24,9 @@ public class UserService
 
     public async Task<List<User>> GetAllUsers()
     {
-        await Task.Delay(100);
+        List<User> users = await _context.Users.ToListAsync();
 
-        return _users;
+        return users;
     }
 
     public async Task<LoginResponseDto> Login(LoginRequestDto login)
@@ -48,8 +52,12 @@ public class UserService
         //cria o usuario no tipo User pra ir pro banco
         User user = new(userRequest.UserName, passwordHash, userRequest.Password);
 
+        //adiciona no banco
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        //adiciona no mock
         _users.Add(user);
-        await Task.Delay(100);
 
         return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, null);
     }
