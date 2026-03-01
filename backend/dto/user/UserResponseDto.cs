@@ -1,4 +1,4 @@
-namespace MiniSocial.Dto;
+namespace MiniSocial.Dto.User;
 
 public class UserResponseDto(Guid? id, string userName, DateTime? createdAt, DateTime? updatedAt)
 {

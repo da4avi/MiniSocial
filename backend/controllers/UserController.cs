@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MiniSocial.Dto;
+using MiniSocial.Dto.User;
 using MiniSocial.Models;
 using MiniSocial.Services;
 

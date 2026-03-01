@@ -3,7 +3,7 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MiniSocial.Data;
-using MiniSocial.Dto;
+using MiniSocial.Dto.User;
 using MiniSocial.Models;
 
 namespace MiniSocial.Services;

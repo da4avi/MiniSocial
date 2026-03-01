@@ -1,4 +1,4 @@
-namespace MiniSocial.Dto;
+namespace MiniSocial.Dto.User;
 
 public class LoginResponseDto(Guid? id, string userName)
 {

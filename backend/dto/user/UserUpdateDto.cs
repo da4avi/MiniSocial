@@ -1,4 +1,4 @@
-namespace MiniSocial.Dto;
+namespace MiniSocial.Dto.User;
 
 public class UserUpdateDto(Guid id, string? userName, string? password, string? bio)
 {
