@@ -1,46 +1,46 @@
 # MiniSocial
 
-API em ASP.NET Core para uma rede social.
+ASP.NET Core API for a social network.
 
-## Sobre
+## About
 
-Hoje o projeto é uma mini rede social, mas busca evoluir para que cada perfil funcione como um blog pessoal.
+Right now the project is a small social network, but the goal is to evolve it into something where each profile works like a personal blog.
 
-A ideia é priorizar conteúdo mais pensado, diminuindo a quantidade mas focando na qualidade de cada post.
+The idea is to encourage more thoughtful content, reducing volume while focusing on quality.
 
-O foco atual está na API e nas regras de negócio.  
+At the moment, the focus is on the API and the business rules.
 
-Concluindo a API o front-end vai ser desenvolvido em Angular.
+Once the API is solid, a front-end will be developed in Angular.
 
 ## Stack
 
 - ASP.NET Core Web API
 - SQL Server (Docker)
 
-## Como rodar o projeto
+## How to run the project
 
-### Requisitos
+### Requirements
 - SDK .NET 10.0
 - Docker
 
-### 1. Subir o SQL Server no Docker
+### 1. Run SQL Server in Docker
 
 ```bash
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=suasenha" -p 1433:1433 --name sqlserver-dev -v sql_data:/var/opt/mssql -d mcr.microsoft.com/mssql/server:2025-latest
+docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourpassword" -p 1433:1433 --name sqlserver-dev -v sql_data:/var/opt/mssql -d mcr.microsoft.com/mssql/server:2025-latest
 ```
 
-### 2. Configurar a connection string (User Secrets)
+### 2. Configure the connection string (User Secrets)
 
 ```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=sqlserver-dev;User Id=sa;Password=suasenha;TrustServerCertificate=True;"
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1433;Database=sqlserver-dev;User Id=sa;Password=yourpassword;TrustServerCertificate=True;"
 ```
 
-### 3. Rodar a API
+### 3. Run the API
 
 ```bash
 dotnet run
 ```
 
-### 4. Acessar pelo Swagger
+### 4. Access Swagger
 
-http://localhost:porta/swagger
+http://localhost:port/swagger
