@@ -15,20 +15,14 @@ public class UserService(IPasswordHasher<User> passwordHasher, AppDbContext cont
 
     public async Task<List<UserResponseDto>> GetUsers()
     {
-        //pega todos os usuarios
-        List<User> users = await _context.Users.AsNoTracking().ToListAsync();
-
-        //lista pro dto
-        List<UserResponseDto> usersResponse = [];
-
-        //monta o dto
-        foreach (var user in users)
-        {
-            UserResponseDto userResponse = new(user.Id, user.UserName, user.CreatedAt, user.UpdatedAt);
-            usersResponse.Add(userResponse);
-        }
-
-        return usersResponse;
+        //pega todos os usuarios e cria uma lista mapeando pra UserResponseDto
+        return await _context.Users.AsNoTracking().Select(post => new UserResponseDto(
+            post.Id,
+            post.UserName,
+            post.CreatedAt,
+            post.UpdatedAt
+        ))
+        .ToListAsync();
     }
 
     public async Task<LoginResponseDto> Login(LoginRequestDto login)
@@ -85,12 +79,14 @@ public class UserService(IPasswordHasher<User> passwordHasher, AppDbContext cont
 
     public async Task<User> GetUserById (Guid id)
     {
+        //procura o usuario com o id que foi passado se nao existir da exceptions
         User user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id) ?? throw new Exception("Id not found");
         return user;
     }
 
     public async Task DeleteUser (UserDeleteDto userDelete)
     {
+        //remove o usuario do banco
         User user = await GetUserById(userDelete.Id);
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();

@@ -22,6 +22,7 @@ builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 //services
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<PostService>();
 
 //swagger
 builder.Services.AddEndpointsApiExplorer();

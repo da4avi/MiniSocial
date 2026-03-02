@@ -1,6 +1,6 @@
 namespace MiniSocial.Models;
 
-public class Post(string title, string text, Guid userId)
+public class Post(string? title, string text, Guid userId)
 {
     public Guid? Id { get; set; } = Guid.CreateVersion7();
     public string? Title { get; set; } = title;
