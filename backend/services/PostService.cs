@@ -26,7 +26,7 @@ public class PostService(AppDbContext context)
     public async Task<PostResponseDto> PostPost(PostRequestDto postRequest)
     {
         //busca se o id do usuario existe
-        if (!await _context.Users.AnyAsync(user => user.Id == postRequest.UserId)) throw new Exception("Id not found");
+        // if (!await _context.Users.AnyAsync(user => user.Id == postRequest.UserId)) throw new Exception("Id not found");
 
         //cria o post
         Post post = new(postRequest.Title, postRequest.Text, postRequest.UserId);

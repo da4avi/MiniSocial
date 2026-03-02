@@ -1,6 +1,6 @@
 namespace MiniSocial.Models;
 
-public class User(string userName, string password, string? bio)
+public class UserProfile(string userName, string password, string? bio)
 {
     public Guid? Id { get; set; } = Guid.CreateVersion7();
     public string UserName { get; set; } = userName;
