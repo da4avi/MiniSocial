@@ -17,8 +17,6 @@ Concluindo a API o front-end vai ser desenvolvido em Angular.
 - ASP.NET Core Web API
 - SQL Server (Docker)
 
----
-
 ## Como rodar o projeto
 
 ### Requisitos
@@ -45,4 +43,4 @@ dotnet run
 
 ### 4. Acessar pelo Swagger
 
-http://localhost:<porta>/swagger
+http://localhost:porta/swagger
