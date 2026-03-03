@@ -12,8 +12,8 @@ using MiniSocial.Data;
 namespace MiniSocial.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260303133831_userProfile")]
-    partial class userProfile
+    [Migration("20260303173228_Reset")]
+    partial class Reset
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -242,15 +242,16 @@ namespace MiniSocial.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("MiniSocial.Models.UserProfile", b =>
+            modelBuilder.Entity("MiniSocial.Models.Profile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -262,12 +263,12 @@ namespace MiniSocial.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
+                    b.Property<string>("IdentityId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .IsRequired()
@@ -275,7 +276,7 @@ namespace MiniSocial.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UsersProfile");
+                    b.ToTable("Profiles");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
