@@ -7,6 +7,6 @@ public class RegisterRequestDto()
     public required string Email { get; set; }
     public required string Password { get; set; }
 
-     //userProfile
+    //userProfile
     public string? Bio { get; set;}
 }
