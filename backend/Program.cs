@@ -17,8 +17,8 @@ builder.Services.AddControllers();
 
 //services
 builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<ProfileService>();
+builder.Services.AddScoped<PostService>();
 
 //identity
 builder.Services.AddIdentityConfig();

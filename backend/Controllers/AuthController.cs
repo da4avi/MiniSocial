@@ -1,24 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using MiniSocial.DTOs.Auth;
-using MiniSocial.Models;
 using MiniSocial.Services;
 
 namespace MiniSocial.Controllers;
 
 [ApiController]
-[Route("api/Auth")]
+[Route("api/auth")]
 public class AuthController(AuthService authService) : ControllerBase
 {
     private readonly AuthService _authService = authService;
-
-    [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequestDto loginRequest)
-    {
-        var result = await _authService.Login(loginRequest);
-        return Ok(result);
-    }
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
@@ -27,17 +18,18 @@ public class AuthController(AuthService authService) : ControllerBase
         return Ok(result);
     }
 
-    // [HttpPatch]
-    // public async Task<IActionResult> UpdateUser(UserUpdateDto userUpdate)
-    // {
-    //     var result = await _userService.UpdateUser(userUpdate);
-    //     return Ok(result);
-    // }
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequestDto loginRequest)
+    {
+        var result = await _authService.Login(loginRequest);
+        return Ok(result);
+    }
 
-    // [HttpDelete]
-    // public async Task<IActionResult> DeleteUser(UserDeleteDto userDelete)
-    // {
-    //     await _userService.DeleteUser(userDelete);
-    //     return NoContent();
-    // }
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout()
+    {
+        await _authService.Logout();
+        return NoContent();
+    } 
 }

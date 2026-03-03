@@ -12,6 +12,7 @@ public class AuthService(UserManager<IdentityUser> userManager, SignInManager<Id
 
     public async Task<LoginResponseDto> Login(LoginRequestDto loginRequest)
     {
+        //tenta logar
         var result = await _signInManager.PasswordSignInAsync(
         loginRequest.UserName,
         loginRequest.Password,
@@ -20,6 +21,12 @@ public class AuthService(UserManager<IdentityUser> userManager, SignInManager<Id
         );
 
         return result.Succeeded ? new LoginResponseDto(result.Succeeded, null) : new LoginResponseDto(result.Succeeded, "Login Failed");
+    }
+
+    public async Task Logout()
+    {
+        //desloga
+        await _signInManager.SignOutAsync();
     }
 
     public async Task<RegisterResponseDto> Register(RegisterRequestDto registerRequest)
@@ -31,10 +38,13 @@ public class AuthService(UserManager<IdentityUser> userManager, SignInManager<Id
             Email = registerRequest.Email
         };
 
+        //tenta adicionar no banco
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
+        
         if (result.Succeeded)
         {
+            //cria o profile se deu certo
             await _profileService.RegisterProfile(registerRequest, user.Id);
             return new RegisterResponseDto(result.Succeeded, null);
         } else
