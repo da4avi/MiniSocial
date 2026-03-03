@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using MiniSocial.Data;
 
-namespace MiniSocial.Extensions;
+namespace MiniSocial.Configurations;
 
 public static class IdentityConfig
 {

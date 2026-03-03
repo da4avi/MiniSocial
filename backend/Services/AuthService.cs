@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
-using MiniSocial.Dto.Auth;
+using MiniSocial.DTOs.Auth;
 
 namespace MiniSocial.Services;
 
-public class AuthService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+public class AuthService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ProfileService profileService)
 {
     private readonly UserManager<IdentityUser> _userManager = userManager;
     private readonly SignInManager<IdentityUser> _signInManager = signInManager;
+    private readonly ProfileService _profileService = profileService;
 
-    public async Task<LoginResponseDto> Login(LoginRequest loginRequest)
+    public async Task<LoginResponseDto> Login(LoginRequestDto loginRequest)
     {
         var result = await _signInManager.PasswordSignInAsync(
-        loginRequest.Email,
+        loginRequest.UserName,
         loginRequest.Password,
         isPersistent: true,
         lockoutOnFailure: true
@@ -21,18 +22,25 @@ public class AuthService(UserManager<IdentityUser> userManager, SignInManager<Id
         return result.Succeeded ? new LoginResponseDto(result.Succeeded, null) : new LoginResponseDto(result.Succeeded, "Login Failed");
     }
 
-    public async Task<RegisterResponseDto> Register(RegisterRequest registerRequest)
+    public async Task<RegisterResponseDto> Register(RegisterRequestDto registerRequest)
     {
         //cria o usuario no tipo User pra ir pro banco
         var user = new IdentityUser
         {
-            UserName = registerRequest.Email,
+            UserName = registerRequest.UserName,
             Email = registerRequest.Email
         };
 
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
-        return result.Succeeded ? new RegisterResponseDto(result.Succeeded, null) : new RegisterResponseDto(result.Succeeded, result.Errors.Select(e => e.Description));
+        if (result.Succeeded)
+        {
+            await _profileService.RegisterProfile(registerRequest, user.Id);
+            return new RegisterResponseDto(result.Succeeded, null);
+        } else
+        {
+            return new RegisterResponseDto(result.Succeeded, result.Errors.Select(e => e.Description));
+        }
     }
 
     // public async Task<UserResponseDto> UpdateUser(UserUpdateDto userUpdate)

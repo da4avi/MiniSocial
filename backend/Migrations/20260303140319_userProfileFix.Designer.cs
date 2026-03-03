@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniSocial.Data;
 
@@ -11,9 +12,11 @@ using MiniSocial.Data;
 namespace MiniSocial.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260303140319_userProfileFix")]
+    partial class userProfileFix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,7 +250,7 @@ namespace MiniSocial.Migrations
                     b.ToTable("Posts");
                 });
 
-            modelBuilder.Entity("MiniSocial.Models.Profile", b =>
+            modelBuilder.Entity("MiniSocial.Models.UserProfile", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -272,7 +275,7 @@ namespace MiniSocial.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Profiles");
+                    b.ToTable("UsersProfile");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

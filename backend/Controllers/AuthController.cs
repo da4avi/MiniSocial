@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using MiniSocial.Dto.User;
+using MiniSocial.DTOs.Auth;
 using MiniSocial.Models;
 using MiniSocial.Services;
 
@@ -14,14 +14,14 @@ public class AuthController(AuthService authService) : ControllerBase
     private readonly AuthService _authService = authService;
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequest loginRequest)
+    public async Task<IActionResult> Login(LoginRequestDto loginRequest)
     {
         var result = await _authService.Login(loginRequest);
         return Ok(result);
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequest registerRequest)
+    public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
     {
         var result = await _authService.Register(registerRequest);
         return Ok(result);

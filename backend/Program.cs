@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using MiniSocial.Configurations;
 using MiniSocial.Data;
-using MiniSocial.Extensions;
 using MiniSocial.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +18,7 @@ builder.Services.AddControllers();
 //services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<ProfileService>();
 
 //identity
 builder.Services.AddIdentityConfig();

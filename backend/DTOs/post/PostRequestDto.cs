@@ -1,4 +1,4 @@
-namespace MiniSocial.Dto.Post;
+namespace MiniSocial.DTOs.Post;
 
 public class PostRequestDto(string? title, string text, Guid userId)
 {

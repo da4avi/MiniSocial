@@ -1,4 +1,4 @@
-namespace MiniSocial.Dto.Auth;
+namespace MiniSocial.DTOs.Auth;
 
 public class RegisterResponseDto(bool succeeded, IEnumerable<string>? message)
 {

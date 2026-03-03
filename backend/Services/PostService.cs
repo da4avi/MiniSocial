@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MiniSocial.Data;
-using MiniSocial.Dto.Post;
+using MiniSocial.DTOs.Post;
 using MiniSocial.Models;
 
 namespace MiniSocial.Services;

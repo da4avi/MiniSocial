@@ -7,6 +7,7 @@ namespace MiniSocial.Data
 {
     public class AppDbContext(DbContextOptions<AppDbContext> options): IdentityDbContext<IdentityUser, IdentityRole, string> (options)
     {
-        public DbSet<Post> Posts { get; set;}
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<Profile> Profiles { get; set; }
     }
 }

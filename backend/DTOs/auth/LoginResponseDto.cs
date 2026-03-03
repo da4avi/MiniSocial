@@ -1,4 +1,4 @@
-namespace MiniSocial.Dto.Auth;
+namespace MiniSocial.DTOs.Auth;
 
 public class LoginResponseDto(bool succeeded, string? message)
 {

@@ -1,4 +1,4 @@
-namespace MiniSocial.Dto.Post;
+namespace MiniSocial.DTOs.Post;
 
 public class PostResponseDto(Guid? id, string? title, string text, Guid userId, DateTime? createdAt, DateTime? updatedAt)
 {

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MiniSocial.Dto.Post;
-using MiniSocial.Models;
+using MiniSocial.DTOs.Post;
 using MiniSocial.Services;
 
 namespace MiniSocial.Controllers;
