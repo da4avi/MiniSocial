@@ -1,9 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 using MiniSocial.Configurations;
 using MiniSocial.Data;
+using MiniSocial.Middlewares;
 using MiniSocial.Services;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .CreateLogger(); 
 
 var builder = WebApplication.CreateBuilder(args);
+
+//log
+builder.Host.UseSerilog();
 
 //banco
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -28,6 +38,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+//pipeline
+
+//middleware pra pegar exception
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
