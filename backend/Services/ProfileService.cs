@@ -45,4 +45,19 @@ public class ProfileService(AppDbContext context)
         _context.Profiles.Add(profile);
         await _context.SaveChangesAsync();
     }
+
+    public async Task UpdateProfile(UserUpdateRequestDto userUpdateRequest, string id)
+    {
+        //cria um profile usando o que vem do registro
+        Profile profile = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == id) ?? throw new KeyNotFoundException($"Profile with ID {id} not Found");
+
+        //ve o que tem pra atualizar
+        if (!string.IsNullOrWhiteSpace(userUpdateRequest.UserName)) profile.UserName = userUpdateRequest.UserName;
+        if (!string.IsNullOrWhiteSpace(userUpdateRequest.Bio)) profile.Bio = userUpdateRequest.Bio;
+
+        profile.UpdatedAt = DateTime.UtcNow;
+
+        //adiciona no banco
+        await _context.SaveChangesAsync();
+    }
 }
