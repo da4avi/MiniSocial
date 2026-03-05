@@ -1,41 +1,29 @@
-using Microsoft.EntityFrameworkCore;
 using MiniSocial.Configurations;
-using MiniSocial.Data;
 using MiniSocial.Middlewares;
 using MiniSocial.Services;
-using Serilog;
-
-Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console()
-            .CreateLogger(); 
 
 var builder = WebApplication.CreateBuilder(args);
 
-//log
-builder.Host.UseSerilog();
+//log config
+builder.AddSerilogConfig();
 
-//banco
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+//banco config
+builder.Services.AddDbConfig(builder.Configuration);
+
+//identity config
+builder.Services.AddIdentityConfig();
 
 //controllers
 builder.Services.AddControllers();
+
+//swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 //services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProfileService>();
 builder.Services.AddScoped<PostService>();
-
-//identity
-builder.Services.AddIdentityConfig();
-
-//swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
