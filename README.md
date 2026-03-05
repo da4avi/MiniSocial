@@ -14,7 +14,9 @@ Once the API is solid, a front-end will be developed in Angular.
 
 ## Stack
 
-- ASP.NET Core Web API
+- ASP.NET Core Web 
+- EF Core
+- Identity
 - SQL Server (Docker)
 
 ## How to run the project
