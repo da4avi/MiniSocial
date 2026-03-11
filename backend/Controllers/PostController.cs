@@ -30,6 +30,17 @@ public class PostController(PostService postService) : ControllerBase
         return Ok(result);
     }
 
+    [HttpPatch("likePost")]
+    [Authorize]
+    public async Task<IActionResult> LikePost(LikeRequestDto likeRequest)
+    {
+        //pega o valor da claim que tem o id do usuario logado
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var result = await _postService.LikePost(likeRequest, userId);
+        return Ok(result);
+    }
+
     [HttpGet("myPosts")]
     [Authorize]
     public async Task<IActionResult> GetMyPosts()

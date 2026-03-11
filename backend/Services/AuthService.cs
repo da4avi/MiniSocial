@@ -42,7 +42,6 @@ public class AuthService(UserManager<IdentityUser> userManager, SignInManager<Id
         //tenta adicionar no banco
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
-
         if (result.Succeeded)
         {
             //cria o profile se deu certo

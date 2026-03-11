@@ -16,6 +16,7 @@ public class ProfileService(AppDbContext context)
         return await _context.Profiles.AsNoTracking().Select(userProfile => new ProfileResponseDto(
             userProfile.UserName,
             userProfile.Bio,
+            userProfile.LikedPosts,
             userProfile.CreatedAt,
             userProfile.UpdatedAt
         ))
@@ -30,6 +31,7 @@ public class ProfileService(AppDbContext context)
         .Select(userProfile => new ProfileResponseDto(
             userProfile.UserName,
             userProfile.Bio,
+            userProfile.LikedPosts,
             userProfile.CreatedAt,
             userProfile.UpdatedAt
         ))
@@ -39,7 +41,7 @@ public class ProfileService(AppDbContext context)
     public async Task RegisterProfile(RegisterRequestDto registerRequest, string id)
     {
         //cria um profile usando o que vem do registro
-        Profile profile = new(registerRequest.UserName, registerRequest.Bio, id);
+        Profile profile = new(registerRequest.UserName, registerRequest.Bio, [], id);
 
         //adiciona no banco
         _context.Profiles.Add(profile);
