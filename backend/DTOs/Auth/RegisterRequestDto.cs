@@ -1,6 +1,6 @@
 namespace MiniSocial.DTOs.Auth;
 
-public class RegisterRequestDto()
+public class RegisterRequestDto
 {
     //userIdentity
     public required string UserName { get; set; }
