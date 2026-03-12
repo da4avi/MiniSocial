@@ -16,6 +16,7 @@ public class ProfileService(AppDbContext context)
         return await _context.Profiles.AsNoTracking().Select(userProfile => new ProfileResponseDto(
             userProfile.UserName,
             userProfile.Bio,
+            userProfile.LikedPosts,
             userProfile.CreatedAt,
             userProfile.UpdatedAt
         ))
@@ -30,6 +31,7 @@ public class ProfileService(AppDbContext context)
         .Select(userProfile => new ProfileResponseDto(
             userProfile.UserName,
             userProfile.Bio,
+            userProfile.LikedPosts,
             userProfile.CreatedAt,
             userProfile.UpdatedAt
         ))
@@ -39,10 +41,25 @@ public class ProfileService(AppDbContext context)
     public async Task RegisterProfile(RegisterRequestDto registerRequest, string id)
     {
         //cria um profile usando o que vem do registro
-        Profile profile = new(registerRequest.UserName, registerRequest.Bio, id);
+        Profile profile = new(registerRequest.UserName, registerRequest.Bio, [], id);
 
         //adiciona no banco
         _context.Profiles.Add(profile);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateProfile(UserUpdateRequestDto userUpdateRequest, string id)
+    {
+        //cria um profile usando o que vem do registro
+        Profile profile = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == id) ?? throw new KeyNotFoundException($"Profile with ID {id} not Found");
+
+        //ve o que tem pra atualizar
+        if (!string.IsNullOrWhiteSpace(userUpdateRequest.UserName)) profile.UserName = userUpdateRequest.UserName;
+        if (!string.IsNullOrWhiteSpace(userUpdateRequest.Bio)) profile.Bio = userUpdateRequest.Bio;
+
+        profile.UpdatedAt = DateTime.UtcNow;
+
+        //adiciona no banco
         await _context.SaveChangesAsync();
     }
 }

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using MiniSocial.DTOs.Auth;
+using MiniSocial.Models;
 
 namespace MiniSocial.Services;
 
@@ -41,53 +42,46 @@ public class AuthService(UserManager<IdentityUser> userManager, SignInManager<Id
         //tenta adicionar no banco
         var result = await _userManager.CreateAsync(user, registerRequest.Password);
 
-        
         if (result.Succeeded)
         {
             //cria o profile se deu certo
             await _profileService.RegisterProfile(registerRequest, user.Id);
             return new RegisterResponseDto(result.Succeeded, null);
-        } else
+        }
+        else
         {
             return new RegisterResponseDto(result.Succeeded, result.Errors.Select(e => e.Description));
         }
     }
 
-    // public async Task<UserResponseDto> UpdateUser(UserUpdateDto userUpdate)
-    // {   
-    //     //confere se tem algo pra atualizar
-    //     if (userUpdate.UserName == null && userUpdate.Password == null && userUpdate.Bio == null) throw new Exception("Nothing to update");
+    public async Task<UserUpdateResponseDto> UpdateUser(UserUpdateRequestDto userUpdateRequest, string userId)
+    {
+        //procura o IdentityUser
+        IdentityUser user = await _userManager.FindByIdAsync(userId) ?? throw new KeyNotFoundException($"User with ID {userId} not Found");
 
-    //     //procura o usuario pelo Id. se nao achar da exception
-    //     UserProfile user = await GetUserById(userUpdate.Id);
+        //se o cara quiser mudar username ele tenta se nao conseguir devolve erro
+        if (!string.IsNullOrWhiteSpace(userUpdateRequest.UserName))
+        {
+            var result = await _userManager.SetUserNameAsync(user, userUpdateRequest.UserName);
 
-    //     //atualiza o que tem que atualizar
-    //     if (!string.IsNullOrWhiteSpace(userUpdate.UserName)) user.UserName = userUpdate.UserName; 
-    //     if (!string.IsNullOrWhiteSpace(userUpdate.Password)) user.Password = _passwordHasher.HashPassword(user, userUpdate.Password);
-    //     if (!string.IsNullOrWhiteSpace(userUpdate.Bio)) user.Bio = userUpdate.Bio;
+            if (!result.Succeeded) return new UserUpdateResponseDto(result.Succeeded, result.Errors.Select(e => e.Description));
+        }
 
-    //     //salva a data que foi editado
-    //     user.UpdatedAt = DateTime.UtcNow;
+        //se o cara quiser mudar a senha ele tenta se nao conseguir devolve erro
+        if (!string.IsNullOrWhiteSpace(userUpdateRequest.CurrentPassword) && !string.IsNullOrWhiteSpace(userUpdateRequest.NewPassword))
+        {
+            var result = await _userManager.ChangePasswordAsync(user, userUpdateRequest.CurrentPassword, userUpdateRequest.NewPassword);
 
-    //     //salva no banco
-    //     await _context.SaveChangesAsync();
+            if (!result.Succeeded) return new UserUpdateResponseDto(result.Succeeded, result.Errors.Select(e => e.Description));
+        }
 
-    //     return new UserResponseDto(user.Id, user.UserName, user.CreatedAt, user.UpdatedAt);
-    // }
-
-    // public async Task<UserProfile> GetUserById (Guid id)
-    // {
-    //     //procura o usuario com o id que foi passado se nao existir da exceptions
-    //     UserProfile user = await _context.Users.FirstOrDefaultAsync(user => user.Id == id) ?? throw new Exception("Id not found");
-    //     return user;
-    // }
-
-    // public async Task DeleteUser (UserDeleteDto userDelete)
-    // {
-    //     //remove o usuario do banco
-    //     UserProfile user = await GetUserById(userDelete.Id);
-    //     _context.Users.Remove(user);
-    //     await _context.SaveChangesAsync();
-    // }
+        //atualiza o profile com username e bio
+        await _profileService.UpdateProfile(userUpdateRequest, user.Id);
+        //da refresh no login pra atualizar
+        await _signInManager.RefreshSignInAsync(user);
+        
+        return new UserUpdateResponseDto(true, null);
+        // if (!string.IsNullOrWhiteSpace(userUpdateRequest.Email)) _userManager.ChangeEmailAsync(user, userUpdateRequest.Email, );
+    }
 }
 

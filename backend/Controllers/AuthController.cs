@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniSocial.DTOs.Auth;
@@ -31,5 +32,15 @@ public class AuthController(AuthService authService) : ControllerBase
     {
         await _authService.Logout();
         return NoContent();
-    } 
+    }
+
+    [HttpPut("updateUser")]
+    [Authorize]
+    public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequest)
+    {
+        string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+
+        var result = await _authService.UpdateUser(userUpdateRequest, userId);
+        return Ok(result);
+    }
 }
