@@ -38,6 +38,7 @@ public class AuthController(AuthService authService) : ControllerBase
     [Authorize]
     public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequest)
     {
+        //pega o valor da claim que tem o id do usuario logado
         string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _authService.UpdateUser(userUpdateRequest, userId);
