@@ -3,16 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using MiniSocial.Data;
 using MiniSocial.DTOs.Post;
 using MiniSocial.Models;
+using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Services;
 
-public class PostService(AppDbContext context, UserManager<IdentityUser> userManager, ProfileService profileService)
+public class PostService(AppDbContext context, UserManager<IdentityUser> userManager, IProfileService profileService) : IPostService
 {
     private readonly UserManager<IdentityUser> _userManager = userManager;
 
     private readonly AppDbContext _context = context;
 
-    private readonly ProfileService _profileService = profileService;
+    private readonly IProfileService _profileService = profileService;
 
     public async Task<List<PostResponseDto>> GetPosts()
     {
