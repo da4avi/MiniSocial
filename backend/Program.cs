@@ -1,6 +1,7 @@
 using MiniSocial.Configurations;
 using MiniSocial.Middlewares;
 using MiniSocial.Services;
+using MiniSocial.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,9 +22,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //services
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<ProfileService>();
-builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var app = builder.Build();
 

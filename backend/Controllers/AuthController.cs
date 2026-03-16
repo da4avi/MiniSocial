@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniSocial.DTOs.Auth;
 using MiniSocial.Services;
+using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Controllers;
 
 [ApiController]
 [Route("api/auth")]
-public class AuthController(AuthService authService) : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    private readonly AuthService _authService = authService;
+    private readonly IAuthService _authService = authService;
 
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
@@ -38,6 +39,7 @@ public class AuthController(AuthService authService) : ControllerBase
     [Authorize]
     public async Task<IActionResult> UpdateUser(UserUpdateRequestDto userUpdateRequest)
     {
+        //pega o valor da claim que tem o id do usuario logado
         string userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
         var result = await _authService.UpdateUser(userUpdateRequest, userId);

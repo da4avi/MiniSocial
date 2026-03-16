@@ -3,16 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using MiniSocial.Data;
 using MiniSocial.DTOs.Post;
 using MiniSocial.Models;
+using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Services;
 
-public class PostService(AppDbContext context, UserManager<IdentityUser> userManager, ProfileService profileService)
+public class PostService(AppDbContext context, UserManager<IdentityUser> userManager, IProfileService profileService) : IPostService
 {
     private readonly UserManager<IdentityUser> _userManager = userManager;
 
     private readonly AppDbContext _context = context;
 
-    private readonly ProfileService _profileService = profileService;
+    private readonly IProfileService _profileService = profileService;
 
     public async Task<List<PostResponseDto>> GetPosts()
     {
@@ -48,13 +49,22 @@ public class PostService(AppDbContext context, UserManager<IdentityUser> userMan
 
     public async Task<LikeResponseDto> LikePost(LikeRequestDto likeRequest, string userId)
     {
-        //procura o post
-        Post post = await _context.Posts.FirstOrDefaultAsync(post => post.Id == likeRequest.PostId) ?? throw new KeyNotFoundException($"Post with ID {likeRequest.PostId} not Found");
-        post.Likes ++;
-
         //procura o profile
         Profile profile = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == userId) ?? throw new KeyNotFoundException($"Profile with ID {userId} not Found");
-        profile.LikedPosts.Add(likeRequest.PostId);
+        //procura o post
+        Post post = await _context.Posts.FirstOrDefaultAsync(post => post.Id == likeRequest.PostId) ?? throw new KeyNotFoundException($"Post with ID {likeRequest.PostId} not Found");
+
+        //se o post ja foi curtido tira da lista e diminui o numero de like do post. se nao o contrario
+        if (profile.LikedPosts.Contains(likeRequest.PostId))
+        {
+            profile.LikedPosts.Remove(likeRequest.PostId);
+            post.Likes--;
+        }
+        else
+        {
+            profile.LikedPosts.Add(likeRequest.PostId);
+            post.Likes++;
+        }
 
         await _context.SaveChangesAsync();
 
