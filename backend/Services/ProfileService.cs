@@ -3,10 +3,11 @@ using MiniSocial.Data;
 using MiniSocial.DTOs.Auth;
 using MiniSocial.DTOs.Profile;
 using MiniSocial.Models;
+using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Services;
 
-public class ProfileService(AppDbContext context)
+public class ProfileService(AppDbContext context) : IProfileService
 {
     private readonly AppDbContext _context = context;
 

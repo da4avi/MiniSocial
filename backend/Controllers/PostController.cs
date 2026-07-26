@@ -3,14 +3,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniSocial.DTOs.Post;
 using MiniSocial.Services;
+using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Controllers;
 
 [ApiController]
 [Route("api/post")]
-public class PostController(PostService postService) : ControllerBase
+public class PostController(IPostService postService) : ControllerBase
 {
-    private readonly PostService _postService = postService;
+    private readonly IPostService _postService = postService;
 
     [HttpPost]
     [Authorize]

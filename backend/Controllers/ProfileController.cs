@@ -1,15 +1,15 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MiniSocial.Services;
+using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Controllers;
 
 [ApiController]
 [Route("api/profile")]
-public class ProfileController(ProfileService profileService) : ControllerBase
+public class ProfileController(IProfileService profileService) : ControllerBase
 {
-    private readonly ProfileService _profileService = profileService;
+    private readonly IProfileService _profileService = profileService;
 
     [HttpGet]
     public async Task<IActionResult> GetAllProfiles()

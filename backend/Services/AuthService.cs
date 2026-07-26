@@ -2,14 +2,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using MiniSocial.DTOs.Auth;
 using MiniSocial.Models;
+using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Services;
 
-public class AuthService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ProfileService profileService)
+public class AuthService(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IProfileService profileService) : IAuthService
 {
     private readonly UserManager<IdentityUser> _userManager = userManager;
     private readonly SignInManager<IdentityUser> _signInManager = signInManager;
-    private readonly ProfileService _profileService = profileService;
+    private readonly IProfileService _profileService = profileService;
 
     public async Task<LoginResponseDto> Login(LoginRequestDto loginRequest)
     {
