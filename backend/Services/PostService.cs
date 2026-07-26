@@ -7,13 +7,9 @@ using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Services;
 
-public class PostService(AppDbContext context, UserManager<IdentityUser> userManager, IProfileService profileService) : IPostService
+public class PostService(AppDbContext context) : IPostService
 {
-    private readonly UserManager<IdentityUser> _userManager = userManager;
-
     private readonly AppDbContext _context = context;
-
-    private readonly IProfileService _profileService = profileService;
 
     public async Task<List<PostResponseDto>> GetPosts()
     {

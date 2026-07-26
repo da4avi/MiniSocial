@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/backend/">
+    <Project Path="backend/MiniSocial.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MiniSocial.Tests/MiniSocial.Tests.csproj" />
+  </Folder>
+</Solution>
