@@ -1,5 +1,8 @@
+using MassTransit;
+using MassTransit.Testing;
 using Microsoft.EntityFrameworkCore;
 using MiniSocial.Data;
+using MiniSocial.DTOs.Notifications;
 using MiniSocial.DTOs.Post;
 using MiniSocial.Models;
 using MiniSocial.Services;
@@ -21,8 +24,12 @@ public class PostServiceTests
         //instancia o db
         using var context = new AppDbContext(options);
 
+        //cria um harness do masstransmit
+        var harness = new InMemoryTestHarness();
+        await harness.Start();
+
         //instancia o service
-        var service = new PostService(context);
+        var service = new PostService(context, harness.Bus);
 
         //dados q eu uso no metodo
         var userId = new Guid("019f9a69-f34a-7013-8ff2-899013d864bf");
@@ -52,6 +59,12 @@ public class PostServiceTests
 
         //2ª validaçao - se o post foi adicionado nas curtidas
         userProfile.LikedPosts.ShouldContain(likeRequest.PostId);
+
+        //3ª validaçao - se a notificaçao foi publicada no barramento
+        var message = await harness.Published.Any<LikeEventDto>();
+        message.ShouldBeTrue();
+
+        await harness.Stop();
     }
 
     [Fact]
@@ -63,7 +76,10 @@ public class PostServiceTests
             .Options;
 
         using var context = new AppDbContext(options);
-        var service = new PostService(context);
+        var harness = new InMemoryTestHarness();
+        await harness.Start();
+
+        var service = new PostService(context, harness.Bus);
 
         var userId = new Guid("019f9a69-f34a-7013-8ff2-899013d864bf");
         var likeRequest = new LikeRequestDto { PostId = new Guid("019f9a6b-abc7-7ad1-a7ed-7334d67e08c7") };
@@ -91,5 +107,11 @@ public class PostServiceTests
 
         //2ª validaçao - se o post foi removido das curtidas
         userProfile.LikedPosts.ShouldNotContain(likeRequest.PostId);
+
+        //3ª validaçao - se nao teve nenhuma notificaçao
+        var message = await harness.Published.Any<LikeEventDto>();
+        message.ShouldBeFalse();
+
+        await harness.Stop();
     }
 }
