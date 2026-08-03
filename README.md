@@ -18,6 +18,7 @@ Once the API is solid, a front-end will be developed in Angular.
 - EF Core
 - Identity
 - SQL Server (Docker)
+- RabbitMQ (Docker)
 - xUnit
 - InMemory DataBase
 
