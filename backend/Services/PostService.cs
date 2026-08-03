@@ -1,15 +1,18 @@
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MiniSocial.Data;
+using MiniSocial.DTOs.Notifications;
 using MiniSocial.DTOs.Post;
 using MiniSocial.Models;
 using MiniSocial.Services.Interfaces;
 
 namespace MiniSocial.Services;
 
-public class PostService(AppDbContext context) : IPostService
+public class PostService(AppDbContext context, IPublishEndpoint endpoint) : IPostService
 {
     private readonly AppDbContext _context = context;
+    private readonly IPublishEndpoint _endpoint = endpoint;
 
     public async Task<List<PostResponseDto>> GetPosts()
     {
@@ -45,10 +48,11 @@ public class PostService(AppDbContext context) : IPostService
 
     public async Task<LikeResponseDto> LikePost(LikeRequestDto likeRequest, string userId)
     {
-        //procura o profile
+        //procura o profile que curtiu
         Profile profile = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == userId) ?? throw new KeyNotFoundException($"Profile with ID {userId} not Found");
         //procura o post
         Post post = await _context.Posts.FirstOrDefaultAsync(post => post.Id == likeRequest.PostId) ?? throw new KeyNotFoundException($"Post with ID {likeRequest.PostId} not Found");
+
 
         //se o post ja foi curtido tira da lista e diminui o numero de like do post. se nao o contrario
         if (profile.LikedPosts.Contains(likeRequest.PostId))
@@ -60,6 +64,8 @@ public class PostService(AppDbContext context) : IPostService
         {
             profile.LikedPosts.Add(likeRequest.PostId);
             post.Likes++;
+            //dispara uma notificaçao q fica armazenada no rabbitmq
+            await _endpoint.Publish(new LikeEventDto(post.UserId, profile.Id, post.Id));
         }
 
         await _context.SaveChangesAsync();
