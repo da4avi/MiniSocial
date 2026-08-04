@@ -28,10 +28,10 @@ Once the API is solid, a front-end will be developed in Angular.
 - SDK .NET 10.0
 - Docker
 
-### 1. Run SQL Server in Docker
+### 1. Run Docker compose
 
 ```bash
-docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=yourpassword" -p 1433:1433 --name sqlserver-dev -v sql_data:/var/opt/mssql -d mcr.microsoft.com/mssql/server:2025-latest
+docker compose up -d
 ```
 
 ### 2. Configure the connection string (User Secrets)
