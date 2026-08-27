@@ -66,15 +66,25 @@ public class ProfileService(AppDbContext context) : IProfileService
 
     public async Task<FollowResponseDto> FollowProfile(FollowRequestDto followRequestDto, string id)
     {
-        //perfil seguido
-        Profile followed = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == followRequestDto.UserId) ?? throw new KeyNotFoundException($"Profile with ID {id} not Found");
-        if (!string.IsNullOrWhiteSpace(followRequestDto.UserId)) followed.Followers.Add(id);
-    
-        //seu perfil
+        //perfis
+        Profile followed = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == followRequestDto.UserId) ?? throw new KeyNotFoundException($"Profile with ID {followRequestDto.UserId} not Found");
         Profile follower = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == id) ?? throw new KeyNotFoundException($"Profile with ID {id} not Found");
-        if(!string.IsNullOrWhiteSpace(id)) follower.Following.Add(followRequestDto.UserId);
 
-        //adiciona no banco
+        if (followRequestDto.UserId == id) throw new InvalidOperationException("Follower and Followed ID's are the same");
+
+        //toggle de follow
+        if (!string.IsNullOrWhiteSpace(id) && follower.Following.Contains(followed.IdentityId))
+        {
+            follower.Following.Remove(followed.IdentityId);
+            followed.Followers.Remove(follower.IdentityId);
+        }
+        else
+        {
+            if (!string.IsNullOrWhiteSpace(followRequestDto.UserId)) followed.Followers.Add(id);
+            if (!string.IsNullOrWhiteSpace(id)) follower.Following.Add(followRequestDto.UserId);
+        }
+
+        //atualiza no banco
         await _context.SaveChangesAsync();
 
         return new FollowResponseDto(true);
