@@ -42,7 +42,7 @@ public class ProfileService(AppDbContext context) : IProfileService
     public async Task RegisterProfile(RegisterRequestDto registerRequest, string id)
     {
         //cria um profile usando o que vem do registro
-        Profile profile = new(registerRequest.UserName, registerRequest.Bio, [], id);
+        Profile profile = new(registerRequest.UserName, registerRequest.Bio, [], [], [], id);
 
         //adiciona no banco
         _context.Profiles.Add(profile);
@@ -51,7 +51,7 @@ public class ProfileService(AppDbContext context) : IProfileService
 
     public async Task UpdateProfile(UserUpdateRequestDto userUpdateRequest, string id)
     {
-        //cria um profile usando o que vem do registro
+        //procura seu perfil
         Profile profile = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == id) ?? throw new KeyNotFoundException($"Profile with ID {id} not Found");
 
         //ve o que tem pra atualizar
@@ -62,5 +62,21 @@ public class ProfileService(AppDbContext context) : IProfileService
 
         //adiciona no banco
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<FollowResponseDto> FollowProfile(FollowRequestDto followRequestDto, string id)
+    {
+        //perfil seguido
+        Profile followed = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == followRequestDto.UserId) ?? throw new KeyNotFoundException($"Profile with ID {id} not Found");
+        if (!string.IsNullOrWhiteSpace(followRequestDto.UserId)) followed.Followers.Add(id);
+    
+        //seu perfil
+        Profile follower = await _context.Profiles.FirstOrDefaultAsync(profile => profile.IdentityId == id) ?? throw new KeyNotFoundException($"Profile with ID {id} not Found");
+        if(!string.IsNullOrWhiteSpace(id)) follower.Following.Add(followRequestDto.UserId);
+
+        //adiciona no banco
+        await _context.SaveChangesAsync();
+
+        return new FollowResponseDto(true);
     }
 }

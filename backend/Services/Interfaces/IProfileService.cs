@@ -9,4 +9,5 @@ public interface IProfileService
     public Task<ProfileResponseDto> GetMyProfile(string userId);
     public Task RegisterProfile(RegisterRequestDto registerRequest, string id);
     public Task UpdateProfile(UserUpdateRequestDto userUpdateRequest, string id);
+    public Task<FollowResponseDto> FollowProfile(FollowRequestDto followRequestDto, string id);
 }
